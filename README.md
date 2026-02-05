@@ -1,26 +1,10 @@
-# PipelineScheduler
+# CHEIS
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14789255.svg)](https://doi.org/10.5281/zenodo.14789255)
-
-PipelineScheduler is a system which enables the highest performance in terms of throughput and latency. 
+CHEIS is a system which enables the highest performance in terms of throughput and latency. 
 It can find the **optimal workload distribution** to split the pipelines between the server and the Edge devices, and apply **local optimization** of runtime parameters like **inference batch size**.
-The control components ensure the best throughput and latency against challenges such as *content dynamics* and *network instability*.
-PipelineScheduler also considers *resource contention* and is equipped with **inference spatiotemporal scheduling** to mitigate the adverse effects of *co-location interference*. 
-The research works behind our design have been published at [PerCom](https://percom.org/2025/) and [ArXiv](https://www.arxiv.org/abs/2507.18047) titled ***Workload-Aware Inference Serving for Edge Video Analytics*** and ***FCPO: Federated Continual Policy Optimization for Real-Time High-Throughput Edge Video Analytics***.
-Architectural diagram:
+The control components ensure the best throughput and latency against challenges such as *content dynamics* and *resource instability*.
 
-![overall-arch](/assets/overall-arch.png)
-
-
-We also incorporate learning-based workload prediction, a real-time video analytics scheduling system for distributed camera networks.
-By learning and predicting fine-grained spatiotemporal workload dynamics, PipelineScheduler can proactively generate efficient task-offloading strategies that adapt to rapidly changing video streams and heterogeneous device conditions.
-This predictive capability enables the system not only to react to runtime variations but also to anticipate them, further improving resilience and efficiency in distributed inference pipelines.
-Our paper on this topic will appear in [ICSOC](https://icsoc2025.hit.edu.cn/) 2025 titled ***OctoCross: Workload-Aware Request Offloading Scheduling in Cross-Camera Collaboration***
-Currently, this feature is only available in branch [OctoCross-ICSOC2025](https://github.com/tungngreen/PipelineScheduler/tree/OctoCross-ICSOC2025) but will be merged into the *master* branch soon.
-
-
-This repo is contributed and maintained by Thanh-Tung Nguyen, Lucas Liebe (equally), and other colleges at [CDSN Lab](http://cds.kaist.ac.kr) at KAIST.
-
+This repository is developed on the base of PipelineScheduler (OctopInf), which is an open-source distributed DNN inference system for Edge clusters.
 When using our Code please cite our works at the end of this [README](#citing-our-works).
 
 # Table of Contents
@@ -31,7 +15,7 @@ When using our Code please cite our works at the end of this [README](#citing-ou
    * [Device Agent](#device-agent)
    * [Inference Container](#inference-container)  
      * [Container Agent](#container-agent)
-     * [Local Optimizations (FCPO)](#local-optimizations-fcpo)
+     * [Local Optimizations (CHEIS)](#local-optimizations-cheis)
      * [Configurations](#configurations)  
    * [Knowledge Base](#knowledge-base)  
 3. [Running ***PipelineScheduler***](#running-pipelinescheduler)  
@@ -81,11 +65,11 @@ But other designs (e.g., monolithic) works as well as long as the endpoints for 
 The **Container Agent** is a light-weight thread in charge of creating/deleting the microservices according to the instructions of the **Device Agent** and **Controller**.
 It also collects operational stats inside the container and published them to designated metrics endpoints.
 
-### Local Optimizations (FCPO)
-When compiling and running the system with the `FCPO` option, the **Inference Container** will be equipped with an iAgent.
-As presented in [FCPO](https://www.arxiv.org/abs/2507.18047), the iAgent is a local optimization agent which runs attached to each container to optimize the inference batch size and other parameters at a high frequency.
+### Local Optimizations (CHEIS)
+When compiling and running the system with the `CHEIS` option, the **Inference Container** will be equipped with an iAgent.
+As presented in CHEIS, the iAgent is a local optimization agent which runs attached to each container to optimize the inference batch size and other parameters at a high frequency.
 This is beneficial for the system to adapt to the dynamic environment, such as changing network bandwidth and varying content dynamics, in a more responsive way than the global optimization of the **Controller**.
-The iAgent is implemented as a C++ thread running inside the **Inference Container** and is implemented [here](/libs/fcpo_learning).
+The iAgent is implemented as a C++ thread running inside the **Inference Container** and is implemented [here](/libs/iagent_learning).
 Every iAgent is trained through FCRL, where models are locally trained using Continual Reinforcement Learning (CRL) and aggregated at the **Controller**.
 The Hyperparameters can be configured in the [experiment jsons](/jsons/experiments/README.md) provided to the **Controller** or in the [container configuration](#configurations).
 
@@ -174,7 +158,7 @@ The microservice details are defined under `"cont_pipeline"`. This is what the e
 }
 ```
 
-When running [FCPO](https://www.arxiv.org/abs/2507.18047), which enable local optimization, the config should also contain an fcpo section with hyperparameterts.
+When running [CHEIS](), which enable local optimization, the config should also contain an iagent section with hyperparameters.
 
 ```json
 {
@@ -203,7 +187,7 @@ However, when running the whole system, the configurations are automatically mod
 ## Knowledge Base
 The Knowledge Base is a PostgreSQL (14) database which contains all the operational statistics.
 
-# Running ***PipelineScheduler***
+# Running ***CHEIS***
 ## Installation
 ### Prerequisites
 To run the system, this following software must be installed on the host machines.
@@ -219,7 +203,7 @@ Inside the container, it is also necessary to install inference software platfor
 The specific software versions and commands for installation can be found taken from the [dockerfiles](/dockerfiles/), which are written to build inference container images. 
 Since the current version is run on NVIDIA hardware (i.e., GPU and Jetson devices), most of the images are built upon NVIDIA container images published [here](https://catalog.ngc.nvidia.com/containers).
 
-The build instructions can be found [here](dockerfiles/README) and base containers without data or models are available [here](https://hub.docker.com/r/lucasliebe/pipeplusplus/tags).
+The build instructions can be found [here](dockerfiles/README) and base containers without data or models are available [TBA After Review]().
 
 ### Inference Platform
 The current versions of `Preprocessors, Postprocessors and Inferencer` are written for NVIDIA hardware, especially the `Inferencer`. But custom microservices can be written based on these with minimal adaptation.
@@ -231,8 +215,7 @@ The first step is to build the source code, here you can use multiple options fo
 * The **Controller**
     ```bash
     mkdir build_host && cd build_host
-    cmake -DSYSTEM_NAME=[FCPO, PPP, DIS, JLF, RIM, BCE] -DON_HOST=True -DDEVICE_ARCH=platform_name
-    # Ours are FCPO and PPP (standing for PipePlusPlus ~ OctopInf)
+    cmake -DSYSTEM_NAME=[CHEIS, PPP, DIS, JLF, RIM, BCE] -DON_HOST=True -DDEVICE_ARCH=platform_name
     # Platform name is amd64, orin, or xavier.
     make -j 64 Controller
     ```
@@ -240,8 +223,7 @@ The first step is to build the source code, here you can use multiple options fo
 * The **Device Agent** 
     ```bash
     mkdir build_host && cd build_host
-    cmake -DSYSTEM_NAME=[FCPO, PPP, DIS, JLF, RIM, BCE] -DON_HOST=True -DDEVICE_ARCH=platform_name
-    # Ours are FCPO and PPP (standing for PipePlusPlus ~ OctopInf)
+    cmake -DSYSTEM_NAME=[CHEIS, PPP, DIS, JLF, RIM, BCE] -DON_HOST=True -DDEVICE_ARCH=platform_name
     # Platform name is amd64, orin, or xavier.
     make -j 64 Device_Agent
     ```
@@ -249,8 +231,7 @@ The first step is to build the source code, here you can use multiple options fo
 * The microservices **inside each container**
     ```bash
     mkdir build && cd build
-    cmake -DSYSTEM_NAME=[FCPO, PPP, DIS, JLF, RIM, BCE] -DON_HOST=False -DDEVICE_ARCH=platform_name
-    # Ours are FCPO and PPP (standing for PipePlusPlus ~ OctopInf)
+    cmake -DSYSTEM_NAME=[CHEIS, PPP, DIS, JLF, RIM, BCE] -DON_HOST=False -DDEVICE_ARCH=platform_name
     # Platform name is amd64, orin, or xavier.
     make -j 64 Container_[name]
     # Name of the model. YoloV5 for instance.
@@ -266,8 +247,7 @@ Models need to be prepared accordingly to fit the current hardware and software 
 * Build
     ```bash
     mkdir build && cd build
-    cmake -DSYSTEM_NAME=[FCPO, PPP, DIS, JLF, RIM, BCE] -DON_HOST=False -DDEVICE_ARCH=platform_name
-    # Ours are FCPO and PPP (standing for PipePlusPlus ~ OctopInf)
+    cmake -DSYSTEM_NAME=[CHEIS, PPP, DIS, JLF, RIM, BCE] -DON_HOST=False -DDEVICE_ARCH=platform_name
     # Platform name is amd64, orin, or xavier.
     make -j 64 convert_onnx2trt
     ```
@@ -285,7 +265,7 @@ Models need to be prepared accordingly to fit the current hardware and software 
 ## Running
 * Step 1: Running the **Controller**.
     ```bash
-    ./Controller --ctrl_configPath ../jsons/experiments/full-run-fcpo.json
+    ./Controller --ctrl_configPath ../jsons/experiments/cheis/full-run.json
     ```
     * The guideline to set configurations for controller run is available [here](/jsons/experiments/README.md).
 * Step 2: Once the **Controller** is running, run a **Device Agent** on each device.
@@ -328,38 +308,4 @@ The required json configurations can be found [here](/jsons/) or created from th
 # Citing our works
 If you find the repo useful, please cite the following works which have encompassed the development of this repo.
 
-* **OCTOPINF: Workload-Aware Real-Time Inference Serving for Edge Video Analytics** 
-    ```
-    @inproceedings{nguyen2025octopinf,
-        author={Thanh-Tung Nguyen and Lucas Liebe and Tau-Nhat Quang and Yuheng Wu and Jinghan Cheng and Dongman Lee}
-        title = {{OCTOPINF: Workload-Aware Real-Time Inference Serving for Edge Video Analytics}},
-        booktitle = {The 23rd International Conference on Pervasive Computing and Communications (PerCom)},
-        year = {2025},
-        publisher = {IEEE},
-        month = march,
-    }
-    ```
-
-
-* **FCPO: Federated Continual Policy Optimization for Real-Time High-Throughput Edge Video Analytics** 
-    ```
-    @inproceedings{liebe2025fcpo,
-        author={Lucas Liebe and Thanh-Tung Nguyen and Dongman Lee}
-        title = {{FCPO: Federated Continual Policy Optimization for Real-Time High-Throughput Edge Video Analytics}},
-        booktitle = {arXiv},
-        year = {2025},
-        month = july,
-    }
-    ```
-
-* **OctoCross: Workload-Aware Request Offloading Scheduling in Cross-Camera Collaboration** 
-    ```
-    @inproceedings{cheng2025octocross,
-        author={Jinghan Cheng and Thanh-Tung Nguyen and Lucas Liebe and Yuheng Wu and Tau-Nhat Quang and Pablo Espinosa and Dongman Lee}
-        title = {{OctoCross: Workload-Aware Request Offloading Scheduling in Cross-Camera Collaboration}},
-        booktitle = {Service-{Oriented} {Computing}},
-	    publisher = {Springer Nature},
-        year = {2025},
-        month = march,
-    }
-    ```
+TBA

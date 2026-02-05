@@ -178,7 +178,7 @@ endif()
 add_subdirectory(libs/microservice)
 add_subdirectory(libs/utils/protobufprotocols)
 
-add_subdirectory(libs/fcpo_learning)
+add_subdirectory(libs/iagent_learning)
 add_subdirectory(libs/controller)
 add_subdirectory(libs/communicator)
 add_subdirectory(libs/device_agent)
@@ -192,7 +192,7 @@ if (ON_HOST STREQUAL "ON" OR ON_HOST STREQUAL "BOTH")
         add_executable(Controller libs/controller/main.cpp)
         target_link_libraries(Controller controller)
 
-        add_executable(RL_OfflineTraining libs/fcpo_learning/offline_training.cpp)
+        add_executable(RL_OfflineTraining libs/iagent_learning/offline_training.cpp)
         target_link_libraries(RL_OfflineTraining fcpo_learning absl::flags absl::flags_parse)
 
         add_executable(BandwidthPredictor_OfflineTraining libs/controller/bandwidth_predictor/main.cpp)

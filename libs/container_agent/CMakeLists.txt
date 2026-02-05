@@ -53,8 +53,8 @@ find_package(controller CONFIG REQUIRED)
 set(baseprocessors_DIR "${CMAKE_CURRENT_BINARY_DIR}/../processing_engine/baseprocessors")
 find_package(baseprocessors CONFIG REQUIRED)
 
-set(fcpo_learning_DIR "${CMAKE_CURRENT_BINARY_DIR}/../fcpo_learning")
-find_package(fcpo_learning CONFIG REQUIRED)
+set(cheis_learning_DIR "${CMAKE_CURRENT_BINARY_DIR}/../cheis_learning")
+find_package(cheis_learning CONFIG REQUIRED)
 
 # Defines the headers for this library.
 # https://cmake.org/cmake/help/v3.11/command/target_include_directories.html
@@ -90,7 +90,7 @@ target_link_libraries(container_agent
         controller
         communicator
         baseprocessors
-        fcpo_learning
+        cheis_learning
 )
 
 # add_executable(ContainerAgent container_agent.cpp)

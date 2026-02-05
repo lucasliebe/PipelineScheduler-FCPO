@@ -78,7 +78,7 @@
          	"pipeline_source_device" : 	"agxavier2"
         }
     ],
-  "fcpo_parameters": {
+  "iagent_parameters": {
     "lambda": 0.1,
     "gamma": 0.1,
     "clip_epsilon": 0.9,
